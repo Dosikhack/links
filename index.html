@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOSIK • Мои проекты</title>
+    <meta name="description" content="Все официальные ссылки DOSIK: магазин, канал, чат, прайс-лист и связь с админом.">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-1: #00C6FF;
+            --neon-2: #0072FF;
+            --shop-1: #00FFA3;
+            --shop-2: #00C6FF;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { overflow-x: hidden; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #0b0b0f;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ===== Анимированный фон (аврора) ===== */
+        .bg-aurora {
+            position: fixed;
+            inset: -20vmax;
+            z-index: -3;
+            background:
+                radial-gradient(40vmax 40vmax at 20% 20%, rgba(0, 198, 255, 0.20), transparent 60%),
+                radial-gradient(35vmax 35vmax at 80% 30%, rgba(0, 255, 163, 0.14), transparent 60%),
+                radial-gradient(45vmax 45vmax at 50% 90%, rgba(0, 114, 255, 0.18), transparent 60%);
+            filter: blur(30px);
+            animation: aurora-drift 24s ease-in-out infinite alternate;
+        }
+
+        @keyframes aurora-drift {
+            0%   { transform: translate3d(0, 0, 0) scale(1); }
+            50%  { transform: translate3d(3%, -4%, 0) scale(1.08); }
+            100% { transform: translate3d(-3%, 3%, 0) scale(1.04); }
+        }
+
+        /* Сетка поверх фона */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 75%);
+            animation: grid-pan 40s linear infinite;
+        }
+
+        @keyframes grid-pan {
+            from { background-position: 0 0, 0 0; }
+            to   { background-position: 44px 88px, 44px 88px; }
+        }
+
+        /* Частицы */
+        #particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Свечение за курсором */
+        .cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 420px; height: 420px;
+            margin: -210px 0 0 -210px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,198,255,0.10), transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 48px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== Появление элементов ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes reveal-up {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Аватар ===== */
+        .header-image {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+            margin-bottom: 26px;
+            position: relative;
+            animation-delay: 0.05s;
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .header-image:hover { transform: translateY(-6px) scale(1.02); }
+
+        /* Вращающаяся неоновая рамка */
+        .header-image::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 24px;
+            background: conic-gradient(from 0deg, var(--neon-1), var(--shop-1), var(--neon-2), var(--neon-1));
+            z-index: 0;
+            animation: spin-border 6s linear infinite;
+            opacity: 0.85;
+        }
+
+        @keyframes spin-border {
+            to { transform: rotate(360deg); }
+        }
+
+        .header-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            position: relative;
+            z-index: 1;
+            border-radius: 20px;
+        }
+
+        /* Блик по фото */
+        .header-image::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 20px;
+            z-index: 2;
+            background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%);
+            background-size: 250% 250%;
+            animation: shine 5s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shine {
+            0%, 65%  { background-position: 150% 0; }
+            100%     { background-position: -50% 0; }
+        }
+
+        /* ===== Заголовок ===== */
+        .profile-title {
+            text-align: center;
+            margin-bottom: 34px;
+            animation-delay: 0.15s;
+        }
+
+        .profile-title h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 38px;
+            letter-spacing: 2px;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            background: linear-gradient(100deg, #ffffff 0%, #8fe9ff 25%, #ffffff 50%, #7cf3c6 75%, #ffffff 100%);
+            background-size: 250% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-flow 6s linear infinite;
+        }
+
+        @keyframes gradient-flow {
+            to { background-position: 250% center; }
+        }
+
+        .profile-title p {
+            font-size: 15px;
+            color: #8b8b96;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* Статус онлайн */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            color: #9ff5cf;
+            background: rgba(0, 255, 163, 0.07);
+            border: 1px solid rgba(0, 255, 163, 0.18);
+        }
+
+        .status .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--shop-1);
+            box-shadow: 0 0 0 0 rgba(0, 255, 163, 0.6);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            70%  { box-shadow: 0 0 0 8px rgba(0, 255, 163, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 163, 0); }
+        }
+
+        /* ===== Кнопки ===== */
+        .links-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .link-card {
+            text-decoration: none;
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 18px 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                        background-color 0.3s ease,
+                        border-color 0.3s ease,
+                        box-shadow 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Подсветка под курсором внутри карточки */
+        .link-card .spot {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.10), transparent 65%);
+            pointer-events: none;
+        }
+
+        .link-card:hover .spot { opacity: 1; }
+
+        .link-card:hover {
+            transform: translateY(-5px) scale(1.015);
+            background-color: rgba(255, 255, 255, 0.075);
+            border-color: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 14px 34px rgba(0,0,0,0.5), 0 0 22px rgba(0, 198, 255, 0.10);
+        }
+
+        .link-card:active { transform: translateY(-1px) scale(0.995); }
+
+        /* Левая полоска при наведении */
+        .link-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--neon-1), var(--neon-2));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            transform-origin: bottom;
+            z-index: 2;
+        }
+
+        .link-card:hover::before {
+            transform: scaleY(1);
+            transform-origin: top;
+        }
+
+        /* ===== Карточка магазина (главная) ===== */
+        .link-card.featured {
+            background: linear-gradient(135deg, rgba(0, 255, 163, 0.10), rgba(0, 198, 255, 0.07));
+            border-color: rgba(0, 255, 163, 0.28);
+            box-shadow: 0 0 26px rgba(0, 255, 163, 0.10);
+            /* появление + пульсирующее свечение одновременно */
+            animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+                       featured-glow 3.2s ease-in-out infinite;
+        }
+
+        /* filter, а не box-shadow — чтобы тень при наведении не перебивалась анимацией */
+        @keyframes featured-glow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(0, 255, 163, 0.18)); }
+            50%      { filter: drop-shadow(0 0 16px rgba(0, 255, 163, 0.40)); }
+        }
+
+        .link-card.featured:hover {
+            border-color: rgba(0, 255, 163, 0.5);
+            box-shadow: 0 14px 34px rgba(0,0,0,0.5), 0 0 42px rgba(0, 255, 163, 0.30);
+        }
+
+        .link-card.featured::before {
+            background: linear-gradient(to bottom, var(--shop-1), var(--shop-2));
+        }
+
+        /* Бегущий блик по карточке магазина */
+        .link-card.featured::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -60%;
+            width: 45%;
+            height: 100%;
+            background: linear-gradient(100deg, transparent, rgba(255,255,255,0.16), transparent);
+            transform: skewX(-20deg);
+            animation: sweep 4.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes sweep {
+            0%, 55%  { left: -60%; }
+            100%     { left: 130%; }
+        }
+
+        .link-card.featured .icon-placeholder {
+            background: linear-gradient(135deg, rgba(0,255,163,0.20), rgba(0,198,255,0.14));
+            border: 1px solid rgba(0, 255, 163, 0.25);
+        }
+
+        .link-card.featured .icon-placeholder svg { fill: #9ff5cf; }
+
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 3px 9px;
+            border-radius: 999px;
+            color: #06120d;
+            background: linear-gradient(90deg, var(--shop-1), var(--shop-2));
+            z-index: 3;
+        }
+
+        /* чтобы бейдж не наезжал на заголовок */
+        .link-card.featured h3 { padding-right: 86px; }
+
+        .icon-placeholder {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background-color: rgba(255,255,255,0.05);
+            margin-right: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .link-card:hover .icon-placeholder {
+            transform: scale(1.1) rotate(-6deg);
+        }
+
+        .icon-placeholder svg {
+            width: 22px;
+            height: 22px;
+            fill: #fff;
+        }
+
+        .text-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .link-card h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            letter-spacing: 0.3px;
+        }
+
+        .link-card p {
+            font-size: 13px;
+            color: #9a9aa6;
+            margin: 0;
+            line-height: 1.35;
+            padding-right: 26px;
+        }
+
+        .arrow {
+            position: absolute;
+            right: 20px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .link-card:hover .arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 44px;
+            font-size: 13px;
+            color: #55555f;
+            animation-delay: 0.6s;
+        }
+
+        .footer a {
+            color: #7fd8f5;
+            text-decoration: none;
+            transition: color 0.25s ease, text-shadow 0.25s ease;
+        }
+
+        .footer a:hover {
+            color: var(--shop-1);
+            text-shadow: 0 0 12px rgba(0,255,163,0.5);
+        }
+
+        @media (max-width: 480px) {
+            .header-image { max-width: 200px; }
+            .profile-title h1 { font-size: 30px; }
+            .link-card { padding: 16px; }
+            .icon-placeholder { width: 40px; height: 40px; margin-right: 12px; }
+            .link-card h3 { font-size: 15px; }
+            .link-card p { font-size: 12px; }
+            .cursor-glow { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal { opacity: 1; transform: none; }
+            #particles, .cursor-glow { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-aurora"></div>
+    <div class="bg-grid"></div>
+    <canvas id="particles"></canvas>
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <div class="container">
+
+        <div class="header-image reveal">
+            <img src="image_0.png" alt="DOSIK">
+        </div>
+
+        <div class="profile-title reveal">
+            <h1>DOSIK</h1>
+            <p>Все мои официальные ссылки</p>
+            <div class="status"><span class="dot"></span> Онлайн • принимаю заказы</div>
+        </div>
+
+        <div class="links-container">
+
+            <a href="https://dosikshop.xyz" class="link-card featured reveal" target="_blank" rel="noopener" style="animation-delay:0.25s">
+                <span class="spot"></span>
+                <span class="badge">Наш сайт</span>
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.16 14.26l.03-.12.9-1.64h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49L19.13 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 14.37 5.48 16 7 16h12v-2H7.42c-.14 0-.26-.11-.26-.24z"/></svg>
+                </div>
+                <div class="text-content">
+                    <h3>DOSIKSHOP.XYZ</h3>
+                    <p>Официальный магазин — покупки напрямую 24/7</p>
+                </div>
+                <div class="arrow">
+                    <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1L7 7L1 13" stroke="#9ff5cf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+            </a>
+
+            <a href="https://t.me/+xuNO48uB7QNlYTUy" class="link-card reveal" target="_blank" rel="noopener" style="animation-delay:0.32s">
+                <span class="spot"></span>
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.35-.49.96-.75 3.78-1.65 6.31-2.74 7.58-3.27 3.61-1.51 4.36-1.77 4.85-1.78.11 0 .35.03.51.16.13.11.17.26.19.38.01.07.02.16.02.26z"/></svg>
+                </div>
+                <div class="text-content">
+                    <h3>Telegram Канал</h3>
+                    <p>Основной канал с обновлениями и новостями</p>
+                </div>
+                <div class="arrow">
+                    <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1L7 7L1 13" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+            </a>
+
+            <a href="https://t.me/+0ci4QqFeYCk5NDBi" class="link-card reveal" target="_blank" rel="noopener" style="animation-delay:0.39s">
+                <span class="spot"></span>
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zM7 9h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>
+                </div>
+                <div class="text-content">
+                    <h3>Чат для общения</h3>
+                    <p>Обсуждения, помощь и наше комьюнити</p>
+                </div>
+                <div class="arrow">
+                    <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1L7 7L1 13" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+            </a>
+
+            <a href="https://t.me/price_list_bydosik" class="link-card reveal" target="_blank" rel="noopener" style="animation-delay:0.46s">
+                <span class="spot"></span>
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                </div>
+                <div class="text-content">
+                    <h3>Price List</h3>
+                    <p>Актуальные цены на софт и услуги</p>
+                </div>
+                <div class="arrow">
+                    <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1L7 7L1 13" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+            </a>
+
+            <a href="https://t.me/dosik_soft1" class="link-card reveal" target="_blank" rel="noopener" style="animation-delay:0.53s">
+                <span class="spot"></span>
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <div class="text-content">
+                    <h3>Связь со мной (Админ)</h3>
+                    <p>По всем вопросам и заказам</p>
+                </div>
+                <div class="arrow">
+                    <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1L7 7L1 13" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+            </a>
+
+        </div>
+
+        <div class="footer reveal">
+            <p>© dosik_soft1 • <a href="https://dosikshop.xyz" target="_blank" rel="noopener">dosikshop.xyz</a></p>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* --- Подсветка под курсором внутри карточек --- */
+        document.querySelectorAll('.link-card').forEach(function (card) {
+            card.addEventListener('pointermove', function (e) {
+                var r = card.getBoundingClientRect();
+                card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+                card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+            });
+        });
+
+        if (reduced) return;
+
+        /* --- Большое свечение, следующее за курсором --- */
+        var glow = document.getElementById('cursorGlow');
+        window.addEventListener('pointermove', function (e) {
+            glow.style.opacity = '1';
+            glow.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
+        });
+        window.addEventListener('pointerleave', function () { glow.style.opacity = '0'; });
+
+        /* --- Частицы --- */
+        var canvas = document.getElementById('particles');
+        var ctx = canvas.getContext('2d');
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        var particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            var count = Math.round((window.innerWidth * window.innerHeight) / 26000);
+            count = Math.max(24, Math.min(count, 70));
+            particles = [];
+            for (var i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    r: Math.random() * 1.8 + 0.5,
+                    vx: (Math.random() - 0.5) * 0.25,
+                    vy: -(Math.random() * 0.35 + 0.08),
+                    a: Math.random() * 0.45 + 0.15,
+                    hue: Math.random() > 0.5 ? '0,198,255' : '0,255,163'
+                });
+            }
+        }
+
+        function tick() {
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.y < -10) { p.y = window.innerHeight + 10; p.x = Math.random() * window.innerWidth; }
+                if (p.x < -10) p.x = window.innerWidth + 10;
+                if (p.x > window.innerWidth + 10) p.x = -10;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(' + p.hue + ',' + p.a + ')';
+                ctx.fill();
+            }
+            requestAnimationFrame(tick);
+        }
+
+        resize();
+        window.addEventListener('resize', resize);
+        requestAnimationFrame(tick);
+    })();
+    </script>
+</body>
+</html>
